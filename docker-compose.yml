@@ -1,0 +1,36 @@
+version: "3.8"
+
+services:
+  eximage:
+    image: joetest:base-${PTEST_VERSION}
+    build:
+      context: ./base
+    command: ["serve"]
+    hostname: eximage
+    container_name: eximage
+    networks:
+      - compute
+    expose:
+      - "22"
+    ports:
+      - "127.0.0.1:6223:22"
+
+  puppet:
+    image: joetest:puppet-${PTEST_VERSION}
+    build:
+      context: ./puppet
+      args:
+        PTEST_VERSION: ${PTEST_VERSION}
+    command: ["puppetserver"]
+    hostname: puppet
+    container_name: puppet
+    networks:
+      - compute
+    expose:
+      - "22"
+      - "8140"
+    ports:
+      - "127.0.0.1:6222:22"
+
+networks:
+  compute:
