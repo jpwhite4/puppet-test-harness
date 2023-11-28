@@ -1,5 +1,5 @@
 ARG PTEST_VERSION
-FROM joetest:base-${PTEST_VERSION}
+FROM puppettest:base-${PTEST_VERSION}
 RUN yum install -y puppetserver
 RUN sed -i 's/-Xms2g -Xmx2g/-Xms1g -Xmx1g/' /etc/sysconfig/puppetserver
 COPY ./xms-puppet/code /etc/puppetlabs/code
