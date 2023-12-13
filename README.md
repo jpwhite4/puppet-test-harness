@@ -26,40 +26,47 @@ docker-compose up
 
 The containers are setup with puppet almost identically to the real cloud.
 
-First login to the puppet server and add an entry to the manifest for the
-test node `eximage`.
+First login to the puppet server
 ```
-ssh -p 6222 centos@localhost
+ssh -p 6222 rocky@localhost
 ```
-And edit the site manifest:
+Inside the `puppet` container, edit the site manifest:
 ```
-[centos@puppet ~]$ sudo vi /etc/puppetlabs/code/environments/production/manifests/sites.pp
+sudo vi /etc/puppetlabs/code/environments/production/manifests/sites.pp
 ```
-For example, to add the node to the manifest with the accounts class you would
+For example, add the node `eximage` to the manifest with the accounts class you would
 add the following:
 ```
 node 'eximage' {
     include accounts
 }
 ```
-Then login to eximage. This can be done either with `ssh eximage`
-from inside the container or `ssh -p 6223centos@localhost` from outside.
-Then run puppet on `eximage` to create the certificate:
+Then login to `eximage`. This can be done either with either
 ```
-[centos@eximage ~]$ sudo /opt/puppetlabs/bin/puppet agent -t
+ssh eximage
 ```
-Then back to the puppet server (either `ssh puppet` from inside or `ssh -p 6222 centos@localhost` from outside) and run the following command:
+from inside the container or
 ```
-[centos@puppet ~]$ sudo /opt/puppetlabs/bin/puppetserver ca list
+ssh -p 6223 rocky@localhost
+```
+from outside.
+
+On `eximage`, start the puppet agent to create the certificate:
+```
+sudo /opt/puppetlabs/bin/puppet agent -t
+```
+Then back to the puppet server run the following command:
+```
+sudo /opt/puppetlabs/bin/puppetserver ca list
 ```
 The new VM should be included in the list. Sign the certificate:
 ```
-[centos@puppet ~]$ sudo /opt/puppetlabs/bin/puppetserver ca sign --certname eximage
+sudo /opt/puppetlabs/bin/puppetserver ca sign --certname eximage
 ```
 
-Then back to the `eximage` to run puppet agent again:
+Back on `eximage`, run the puppet agent again to apply the changes:
 ```
-[centos@eximage ~]$ sudo /opt/puppetlabs/bin/puppet agent -t
+sudo /opt/puppetlabs/bin/puppet agent -t
 ```
 
 # Notes

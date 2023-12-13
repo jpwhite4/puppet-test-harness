@@ -2,7 +2,7 @@ version: "3.8"
 
 services:
   eximage:
-    image: joetest:base-${PTEST_VERSION}
+    image: puppettest:base-${PTEST_VERSION}
     build:
       context: ./base
     command: ["serve"]
@@ -16,7 +16,7 @@ services:
       - "127.0.0.1:6223:22"
 
   puppet:
-    image: joetest:puppet-${PTEST_VERSION}
+    image: puppettest:puppet-${PTEST_VERSION}
     build:
       context: ./puppet
       args:

@@ -1,4 +1,4 @@
-FROM centos:centos7.9.2009
+FROM rockylinux:8.8
 COPY . /build
 RUN /build/install.sh && rm -rf /build
 COPY entrypoint.sh /usr/local/bin/entrypoint.sh

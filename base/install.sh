@@ -16,7 +16,7 @@ GOSU_VERSION=${GOSU_VERSION:-1.12}
 # Install base packages
 #------------------------
 log_info "Installing base packages.."
-yum install -y \
+dnf install -y \
     openssh-server \
     openssh-clients \
     sudo \
@@ -25,7 +25,8 @@ yum install -y \
     vim \
     authconfig \
     openssl \
-    bash-completion
+    bash-completion \
+    passwd
 
 #------------------------
 # Generate ssh host keys
@@ -37,11 +38,11 @@ ssh-keygen -t ed25519 -N '' -f /etc/ssh/ssh_host_ed25519_key
 chgrp ssh_keys /etc/ssh/ssh_host_rsa_key
 chgrp ssh_keys /etc/ssh/ssh_host_ecdsa_key
 chgrp ssh_keys /etc/ssh/ssh_host_ed25519_key
+rm -f /var/run/nologin
 
 #------------------------
 # Setup user accounts
 #------------------------
-
 useradd -ms /bin/bash $ADMIN_USER
 echo $ADMIN_PASSWD | passwd --stdin $ADMIN_USER
 idnumber=`id -u $ADMIN_USER`
@@ -75,7 +76,7 @@ openssl genrsa -out /etc/pki/tls/ca.key 4096
 openssl req -new -x509 -days 3650 -sha256 -key /etc/pki/tls/ca.key -extensions v3_ca -out /etc/pki/tls/ca.crt -subj "/CN=fake-ca"
 # Generate certificate request
 openssl genrsa -out /etc/pki/tls/private/localhost.key 2048
-openssl req -new -sha256 -key /etc/pki/tls/private/localhost.key -out /etc/pki/tls/certs/localhost.csr -subj "/C=US/ST=NY/O=HPC Tutorial/CN=localhost"
+openssl req -new -sha256 -key /etc/pki/tls/private/localhost.key -out /etc/pki/tls/certs/localhost.csr -subj "/C=US/ST=NY/O=Puppet Test/CN=localhost"
 # Config for signing cert
 cat > /etc/pki/tls/localhost.ext << EOF
 authorityKeyIdentifier=keyid,issuer
@@ -92,8 +93,8 @@ openssl x509 -req -CA /etc/pki/tls/ca.crt -CAkey /etc/pki/tls/ca.key -CAcreatese
 cp /etc/pki/tls/ca.crt /etc/pki/ca-trust/source/anchors/
 update-ca-trust extract
 
-yum install -y https://yum.puppet.com/puppet6-release-el-7.noarch.rpm
-yum -y install puppet-agent
-
-yum clean all
-rm -rf /var/cache/yum
+# Install puppet and puppet agent
+dnf install -y https://yum.puppet.com/puppet6-release-el-8.noarch.rpm
+dnf install -y puppet-agent
+dnf clean all
+rm -rf /var/cache/dnf
